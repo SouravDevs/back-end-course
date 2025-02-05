@@ -1,0 +1,15 @@
+{
+    "type": "module",
+    "name": "19.-creating-http-client",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "client": "node --watch client.js",
+        "server": "node --watch server.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": ""
+}

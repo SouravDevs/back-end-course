@@ -1,0 +1,7 @@
+{
+    "type": "module",
+    "scripts": {
+        "dev": "node --watch app.js",
+        "start": "node --watch server.js"
+    }
+}

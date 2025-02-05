@@ -1,0 +1,14 @@
+{
+    "type": "module",
+    "name": "21.-creating-a-web-sever",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+        "dev": "node --watch app.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": ""
+}

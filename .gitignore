@@ -1,0 +1,25 @@
+# Node modules
+node_modules/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+
+# Videos
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.wmv
+*.flv
+
+# Music
+*.mp3
+*.wav
+*.aac
+*.flac
+*.ogg
