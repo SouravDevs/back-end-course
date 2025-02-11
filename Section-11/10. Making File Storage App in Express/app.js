@@ -2,6 +2,8 @@ import express from "express";
 import { createWriteStream } from "fs";
 import { mkdir, readdir, rename, rm, stat } from "fs/promises";
 import cors from "cors";
+import path from "path";
+import { dir, error } from "console";
 
 const app = express();
 
@@ -10,8 +12,9 @@ app.use(cors());
 
 // Read
 app.get("/directory/?*", async (req, res) => {
-  const { 0: dirname } = req.params;
+  const dirname = path.join('/', req.params[0]);
   const fullDirPath = `./storage/${dirname ? dirname : ""}`;
+ try{
   const filesList = await readdir(fullDirPath);
   const resData = [];
   for (const item of filesList) {
@@ -19,6 +22,10 @@ app.get("/directory/?*", async (req, res) => {
     resData.push({ name: item, isDirectory: stats.isDirectory() });
   }
   res.json(resData);
+ }
+ catch(err) {
+  res.json({error: err.message})
+ }
 });
 
 app.post('/directory/?*', async (req, res) => {
@@ -33,7 +40,8 @@ app.post('/directory/?*', async (req, res) => {
 
 // Create
 app.post("/files/*", (req, res) => {
-  const writeStream = createWriteStream(`./storage/${req.params[0]}`);
+  const filePath = path.join("/", req.params[0])
+  const writeStream = createWriteStream(`./storage/${filePath}`);
   req.pipe(writeStream);
   req.on("end", () => {
     res.json({ message: "File Uploaded" });
@@ -41,11 +49,16 @@ app.post("/files/*", (req, res) => {
 });
 
 app.get("/files/*", (req, res) => {
-  const { 0: filePath } = req.params;
+  const filePath = path.join('/', req.params[0]);
+ try{
   if (req.query.action === "download") {
     res.set("Content-Disposition", "attachment");
   }
   res.sendFile(`${import.meta.dirname}/storage/${filePath}`);
+ }
+ catch(err) {
+  res.json({error: err.message})
+ }
 });
 
 // Update
