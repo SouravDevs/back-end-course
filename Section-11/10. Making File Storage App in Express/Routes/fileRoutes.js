@@ -53,17 +53,23 @@ router.post("/:filename", (req, res) => {
 
     const findFile = filesData.find((file) => file.id === id) // Find file with id
     findFile.name = newFileName // Set oldFilename to newFileName
+
     
-    filesData.push(findFile) // Push to filesData
     await writeFile(`./filesDB.json`, JSON.stringify(filesData)) // Write to filesData
     res.json({ message: "Renamed" });
   });
   
   // Delete
-  router.delete("/*", async (req, res) => {
-    const { 0: filePath } = req.params;
+  router.delete("/:id", async (req, res) => {
+    const {id} = req.params; // Get id
+
+    const findFileIndex = filesData.findIndex((file) => file.id === id) // Find the file with id
+    const fileData = filesData[findFileIndex]
+
     try {
-      await rm(`./storage/${filePath}`, { recursive: true });
+      await rm(`./storage/${id}${fileData.extension}`, { recursive: true }); // Delete the file from storage
+      filesData.splice(findFileIndex, 1)
+      await writeFile(`./filesDB.json`, JSON.stringify(filesData))
       res.json({ message: "File Deleted Successfully" });
     } catch (err) {
       res.status(404).json({ message: err.message });

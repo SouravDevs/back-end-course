@@ -8,17 +8,11 @@
   {
     "id": "48a1a0e3-3da6-4f24-9687-3183f04e4135",
     "extension": ".png",
-    "name": "macbook.png"
+    "name": "MacBook.png"
   },
   {
-    "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35",
-    "extension": ".png",
-    "name": "macOS.png"
-  },
-  { "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35", "extension": ".png" },
-  {
-    "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35",
-    "extension": ".png",
-    "name": "macOS.png"
+    "id": "8aa969a8-43fc-4cd2-855a-a4bb95163849",
+    "extension": ".xls",
+    "name": "mock.xls"
   }
 ]
