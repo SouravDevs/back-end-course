@@ -1,5 +1,5 @@
 [
-  { "id": 10, "name": "test.png", "parentDir": 321, "size": 4353 },
+  { "id": 10, "name": "test.png", "parentDirId": 321, "size": 4353 },
   {
     "id": "31176922-af4b-434f-93c4-6222b705a678",
     "extension": ".txt",
@@ -11,8 +11,8 @@
     "name": "MacBook.png"
   },
   {
-    "id": "8aa969a8-43fc-4cd2-855a-a4bb95163849",
-    "extension": ".xls",
-    "name": "mock.xls"
+    "id": "9916b0eb-a98b-4759-99c5-22d0197fccc0",
+    "extension": ".jsp",
+    "name": "OIP.png"
   }
 ]
