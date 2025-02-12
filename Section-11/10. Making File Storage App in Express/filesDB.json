@@ -1,0 +1,27 @@
+[
+  {},
+  {
+    "id": "bd29f05f-bd7f-49ce-8d86-14b58beea169",
+    "extension": ".jsp",
+    "name": "OIP.png",
+    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778"
+  },
+  {
+    "id": "f67ffedc-06cd-4071-a576-61fbf9e64bbc",
+    "extension": ".png",
+    "name": "OIP.png",
+    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778"
+  },
+  {
+    "id": "1c2a9354-6b1e-4039-9190-2e916d821b77",
+    "extension": ".mp4",
+    "name": "Nature.mp4",
+    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778"
+  },
+  {
+    "id": "ec559649-b052-490d-82ea-49687282e582",
+    "extension": ".xlsx",
+    "name": "MOCK_DATA.xlsx",
+    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778"
+  }
+]
