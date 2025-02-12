@@ -1,0 +1,24 @@
+[
+  { "id": 10, "name": "test.png", "parentDir": 321, "size": 4353 },
+  {
+    "id": "31176922-af4b-434f-93c4-6222b705a678",
+    "extension": ".txt",
+    "name": "numbers.txt"
+  },
+  {
+    "id": "48a1a0e3-3da6-4f24-9687-3183f04e4135",
+    "extension": ".png",
+    "name": "macbook.png"
+  },
+  {
+    "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35",
+    "extension": ".png",
+    "name": "macOS.png"
+  },
+  { "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35", "extension": ".png" },
+  {
+    "id": "260a51eb-7068-40f4-9bf7-f21797c6cb35",
+    "extension": ".png",
+    "name": "macOS.png"
+  }
+]
