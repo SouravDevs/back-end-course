@@ -41,6 +41,9 @@ function DirectoryView() {
   async function handleDelete(fileId) {
     const response = await fetch(`${BASE_URL}/file/${fileId}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
     const data = await response.text();
     console.log(data);
@@ -109,7 +112,7 @@ function DirectoryView() {
           <button onClick={() => saveFilename(id)}>Save</button>
           <button
             onClick={() => {
-              handleDelete(name);
+              handleDelete(id);
             }}
           >
             Delete
