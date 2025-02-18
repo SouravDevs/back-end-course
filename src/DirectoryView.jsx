@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";``
 
 function DirectoryView() {
   const BASE_URL = "http://localhost:4000";
@@ -7,25 +7,26 @@ function DirectoryView() {
   const [progress, setProgress] = useState(0);
   const [newFilename, setNewFilename] = useState("");
   const [newDirName, setNewDirName] = useState("");
-  const { "*": dirPath } = useParams();
+  const {dirId}= useParams();
+
 
   const [directoriesList, setDirectoriesList] = useState([])
   const [filesList, setFilesList] = useState([])
 
   async function getDirectoryItems() {
-    const response = await fetch(`${BASE_URL}/directory/${dirPath}`);
+    const response = await fetch(`${BASE_URL}/directory/${dirId || ''}`);
     const data = await response.json();
     setDirectoriesList(data.directories);
     setFilesList(data.files);
   }
   useEffect(() => {
     getDirectoryItems();
-  }, [dirPath]);
+  }, [dirId]);
 
   async function uploadFile(e) {
     const file = e.target.files[0];
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${BASE_URL}/file/${file.name}`, true);
+    xhr.open("POST", `${BASE_URL}/file/${dirId || ''}`, true);
     // xhr.setRequestHeader("parentdirid", null)
     xhr.addEventListener("load", () => {
       console.log(xhr.response);
@@ -75,12 +76,16 @@ function DirectoryView() {
 
   async function createNewDirectory(e) {
     e.preventDefault();
-    const url = `${BASE_URL}/directory${dirPath ? `/${dirPath}` : ''}/${newDirName}`;
+    const url = `${BASE_URL}/directory/${dirId || ''}`;
     const response = await fetch(url, {
-      method: "POST"
+      method: "POST",
+      headers: {
+        dirname: newDirName
+      }
     })
     const data = await response.json()
     console.log(data);
+    setNewDirName('')
     getDirectoryItems()
   }
 
@@ -96,8 +101,28 @@ function DirectoryView() {
       <form onSubmit={createNewDirectory}>
         <br />
         <input type="text" value={newDirName} onChange={e => setNewDirName(e.target.value)} placeholder="Enter directory name" />
+        <button type="submit">Create Directory</button>
       </form>
       <p>Progress: {progress}%</p>
+      {directoriesList.map(({ name, id }, i) => (
+        <div key={i}>
+          {name} {" "}
+          <Link to={`directory/${id}`}>
+              Open
+            </Link>
+          {" "}
+          <button onClick={() => renameFile(name)}>Rename</button>
+          <button onClick={() => saveFilename(id)}>Save</button>
+          <button
+            onClick={() => {
+              handleDelete(id);
+            }}
+          >
+            Delete
+          </button>
+          <br />
+        </div>
+      ))}
       {filesList.map(({ name, id }, i) => (
         <div key={i}>
           {name} {" "}
