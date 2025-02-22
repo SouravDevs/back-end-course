@@ -1,6 +1,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
+import cors from 'cors'
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -19,6 +20,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const app = express();
+
+app.use(cors())
 
 const PORT = 4000;
 
@@ -45,7 +48,8 @@ app.post(
     console.log(req.body.age);
     console.log(req.files);
 
-    res.json({ message: req.file });
+    console.log(req.body);
+    res.json({ message: req.files });
   }
 );
 
