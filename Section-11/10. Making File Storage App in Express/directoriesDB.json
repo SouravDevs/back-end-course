@@ -3,37 +3,10 @@
     "id": "a965303d-2899-48f9-902b-bd1992d06778",
     "name": "root",
     "parentDir": null,
-    "files": [
-      "f67ffedc-06cd-4071-a576-61fbf9e64bbc",
-      "ec559649-b052-490d-82ea-49687282e582",
-      "b0fa3145-7e03-4646-a5f2-a67f6d3025c9",
-      "69bb281f-e7ee-4902-baed-d0b6975b5885",
-      "a24a6090-3faa-4d2e-a9b3-a4caa79fc2e9"
-    ],
+    "files": [],
     "directories": [
-      "b5f120e9-78c6-4d7a-b72a-5d73a4256295",
-      "71bbfcec-aa5f-4dd6-a30d-fe639b135a47"
+      "dd6060fd-dffd-4599-a8fd-7670268d518f",
+      "f6652dd5-c881-4e55-9dd2-a1fed41167e3"
     ]
-  },
-  {
-    "id": "b5f120e9-78c6-4d7a-b72a-5d73a4256295",
-    "name": "hi",
-    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778",
-    "files": [],
-    "directories": ["4c3e5f76-9fb5-4607-b370-5915f54bcf9a"]
-  },
-  {
-    "id": "71bbfcec-aa5f-4dd6-a30d-fe639b135a47",
-    "name": "hello",
-    "parentDirId": "a965303d-2899-48f9-902b-bd1992d06778",
-    "files": [],
-    "directories": []
-  },
-  {
-    "id": "4c3e5f76-9fb5-4607-b370-5915f54bcf9a",
-    "name": "hii",
-    "parentDirId": "b5f120e9-78c6-4d7a-b72a-5d73a4256295",
-    "files": [],
-    "directories": []
   }
 ]
