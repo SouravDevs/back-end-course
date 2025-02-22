@@ -1,6 +1,5 @@
 import express from "express";
 import multer from "multer";
-
 import path from "path";
 
 const storage = multer.diskStorage({
@@ -20,17 +19,36 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const app = express();
+
 const PORT = 4000;
 
+// For Single File Upload
+// app.post("/upload", upload.single("profilePic"), (req, res) => {
+
+//     console.log(req.body.username);
+//     console.log(req.body.age);
+//     console.log(req.file);
+
+//     res.json({ message: req.file });
+// });
+
+// For Multi File Upload
 app.post(
   "/upload",
   upload.fields([
     { name: "profilePic", maxCount: 1 },
     { name: "profilePic2", maxCount: 1 },
+    { name: "profilePic3", maxCount: 1 },
   ]),
   (req, res) => {
-    res.send({ message: req.files });
+    console.log(req.body.username);
+    console.log(req.body.age);
+    console.log(req.files);
+
+    res.json({ message: req.file });
   }
 );
 
-app.listen(PORT, () => console.log(`Server is running on PORT: ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on PORT: ${PORT}`);
+});
