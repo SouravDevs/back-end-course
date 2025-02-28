@@ -1,11 +1,21 @@
-import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import DirectoryView from "./directoryView";
+import DirectoryView from "./DirectoryView";
+import Register from "./Register";
+import "./App.css";
+import Login from "./Login";
 
 const router = createBrowserRouter([
   {
-    path: "/*",
+    path: "/",
     element: <DirectoryView />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
   },
   {
     path: "/directory/:dirId",
@@ -13,8 +23,8 @@ const router = createBrowserRouter([
   },
 ]);
 
-const App = () => {
-  return <RouterProvider router={router} />
-};
+function App() {
+  return <RouterProvider router={router} />;
+}
 
 export default App;
