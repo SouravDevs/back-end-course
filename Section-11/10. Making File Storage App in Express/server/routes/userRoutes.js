@@ -1,69 +1,77 @@
 import express from "express";
-import directoriesData from '../directoriesDB.json' with {type: 'json'};
-import usersData from '../usersDB.json' with {type: 'json'};
-import { writeFile } from "node:fs/promises";
+import { writeFile } from "fs/promises";
+import directoriesData from '../directoriesDB.json' with {type: "json"}
+import usersData from '../usersDB.json' with {type: "json"}
+import checkAuth from "../auth.js";
 
 const router = express.Router();
 
-router.post('/register', async(req, res, next) => {
-    const {name, email, password} = req.body;
+router.post('/register', async (req, res, next) => {
+  const {name, email, password} = req.body
 
-    const userId = crypto.randomUUID();
-    const dirId = crypto.randomUUID();
-
-    const user = usersData.find((user) => user.email === email)
-
-    if(user) {
-        return res.status(409).json({message: "User already exists"})
-    }
-
-    directoriesData.push({
-        id: dirId,
-        name: `root-${email}`,
-        userId,
-        parentDirId: null,
-        files: [],
-        directories: []
+  const foundUser = usersData.find((user) => user.email === email)
+  console.log(foundUser);
+  if(foundUser) {
+    return res.status(409).json({
+      error: "User already exists",
+      message: "A user with this email address already exists. Please try logging in or use a different email."
     })
+  }
 
+  const dirId = crypto.randomUUID()
+  const userId = crypto.randomUUID()
 
-    usersData.push({
-        id: userId,
-        name,
-        email,
-        password,
-        rootDirId: dirId
-    })
+  directoriesData.push({
+    id: dirId,
+    name: `root-${email}`,
+    userId,
+    parentDirId: null,
+    files: [],
+    directories: []
+  })
 
-   try {
+  usersData.push({
+    id: userId,
+    name,
+    email,
+    password,
+    rootDirId: dirId
+  })
 
-    await writeFile("./directoriesDB.json", JSON.stringify(directoriesData));
-    await writeFile("./usersDB.json", JSON.stringify(usersData));
-
-    return res.status(201).json({message: "User Registered!"})
-
-   }
-    catch (error) {
-        next(error)
-   }
+  try {
+    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
+    await writeFile('./usersDB.json', JSON.stringify(usersData))
+    res.status(201).json({message: "User Registered"})
+  } catch(err) {
+    next(err)
+  }
 
 })
 
 router.post('/login', async (req, res, next) => {
-    // Find user using email
-    const {email, password} = req.body;
-
-    const user = usersData.find((user) => user.email === email);
-
-    if(!user || user.password !== password) {
-        return res.status(404).json({error: "Invalid credentials!"})
-    }
-
-    res.cookie('uid', user.id, {
-        httpOnly: true,
-        maxAge: 60 * 1000 * 60 * 24 * 7
-    })
-     res.json({message: "User Logged!"})
+  const {email, password} = req.body
+  const user = usersData.find((user) => user.email === email)
+  if(!user || user.password !== password) {
+    return res.status(404).json({error: 'Invalid Credentials'})
+  }
+  res.cookie('uid', user.id, {
+    httpOnly: true,
+    maxAge: 60 * 1000 * 60 * 24 * 7
+  })
+  res.json({message: 'logged in'})
 })
 
+
+router.get('/', checkAuth, (req, res) => {
+  res.status(200).json({
+    name: req.user.name,
+    email: req.user.email
+  })
+})
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('uid')
+
+  res.status(200).json({message: 'Logged Out!'})
+})
 export default router;
