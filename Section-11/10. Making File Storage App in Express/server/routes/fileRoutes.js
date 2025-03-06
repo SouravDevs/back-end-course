@@ -5,9 +5,15 @@ import path from "path";
 import crypto from "crypto"; // Ensure you're importing crypto if not already
 import directoriesData from "../directoriesDB.json" with { type: "json" };
 import filesData from "../filesDB.json" with { type: "json" };
+import validateIdMiddleWare from "../middlewares/validateIdMiddleWare.js";
 
 
 const router = express.Router();
+
+// Use of req.param()
+router.param('parentDirId', validateIdMiddleWare)
+router.param('id', validateIdMiddleWare)
+
 
 // ================================
 // CREATE
@@ -83,8 +89,8 @@ router.get("/:id", (req, res) => {
 
   // If "download" is requested, set the appropriate headers
   if (req.query.action === "download") {
-    res.set("Content-Disposition", `attachment; filename=${fileData.name}`);
-  //  return res.download(filePath, fileData.name)
+    res.set("Content-Disposition", `attachment; filename=${fileData.name}`); ``
+    //  return res.download(filePath, fileData.name)
   }
 
   // Send file
