@@ -1,46 +1,53 @@
 import express from "express";
-import { writeFile } from "fs/promises";
-import directoriesData from '../directoriesDB.json' with {type: "json"}
-import usersData from '../usersDB.json' with {type: "json"}
 import checkAuth from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.post('/register', async (req, res, next) => {
   const {name, email, password} = req.body
-
-  const foundUser = usersData.find((user) => user.email === email)
-  console.log(foundUser);
-  if(foundUser) {
-    return res.status(409).json({
-      error: "User already exists",
-      message: "A user with this email address already exists. Please try logging in or use a different email."
-    })
-  }
-
-  const dirId = crypto.randomUUID()
-  const userId = crypto.randomUUID()
-
-  directoriesData.push({
-    id: dirId,
-    name: `root-${email}`,
-    userId,
-    parentDirId: null,
-    files: [],
-    directories: []
-  })
-
-  usersData.push({
-    id: userId,
-    name,
-    email,
-    password,
-    rootDirId: dirId
-  })
+  const db = req.db;
 
   try {
-    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData))
-    await writeFile('./usersDB.json', JSON.stringify(usersData))
+    const userCollection = db.collection("users");
+    const dirCollection = db.collection("directories");
+
+    const foundUser = await userCollection.findOne({email, password});
+    console.log(foundUser);
+    if(foundUser) {
+      return res.status(409).json({
+        error: "User already exists",
+        message: "A user with this email address already exists. Please try logging in or use a different email."
+      })
+    }
+  
+  
+    // Create directory collection in storageApp
+    const userRootDir = await dirCollection.insertOne(
+      {
+        name: `root-${email}`,
+        parentDirId: null,
+        files: [],
+        directories: []
+      }
+    )
+  
+    const rootDirId = userRootDir.insertedId;
+  
+    const createdUser = await userCollection.insertOne(
+      {
+        name,
+        email,
+        password,
+        rootDirId
+      }
+    )
+  
+    const userId =  createdUser.insertedId;
+  
+    await dirCollection.updateOne(
+      {_id: rootDirId}, { $set: {userId}}
+    )
+
     res.status(201).json({message: "User Registered"})
   } catch(err) {
     next(err)
@@ -50,11 +57,17 @@ router.post('/register', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
   const {email, password} = req.body
-  const user = usersData.find((user) => user.email === email)
-  if(!user || user.password !== password) {
+  const db = req.db;
+
+  const userCollection = db.collection('users');
+  const user = await userCollection.findOne({email, password});
+  console.log(user);
+
+  if(!user) {
     return res.status(404).json({error: 'Invalid Credentials'})
   }
-  res.cookie('uid', user.id, {
+
+  res.cookie('uid', user._id.toString(), {
     httpOnly: true,
     maxAge: 60 * 1000 * 60 * 24 * 7
   })
