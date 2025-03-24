@@ -5,7 +5,12 @@ import directoryRoutes from "./routes/directoryRoutes.js";
 import fileRoutes from "./routes/fileRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import checkAuth from "./middlewares/authMiddleware.js";
+import { connectDB } from "./db.js";
 
+try {
+  const db = await connectDB()
+  console.log(`Database connected: ${db.namespace}`);
+  
 const app = express();
 
 app.use(cookieParser());
@@ -16,6 +21,12 @@ app.use(
     credentials: true,
   })
 );
+
+// Middleware for MongoDB Database
+app.use((req, res, next) => {
+  req.db = db;
+  next()
+})
 
 app.use("/directory", checkAuth, directoryRoutes);
 app.use("/file", checkAuth, fileRoutes);
@@ -29,3 +40,8 @@ app.use((err, req, res, next) => {
 app.listen(4000, () => {
   console.log(`Server Started`);
 });
+
+} catch (error) {
+  console.log("Could not connect to database");
+  console.log(err);
+}
