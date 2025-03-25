@@ -26,8 +26,6 @@ router.post('/register', async (req, res, next) => {
       {
         name: `root-${email}`,
         parentDirId: null,
-        files: [],
-        directories: []
       }
     )
   
