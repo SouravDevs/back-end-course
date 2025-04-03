@@ -1,99 +1,106 @@
 import express from "express";
 import { rm, writeFile } from "fs/promises";
-import directoriesData from '../directoriesDB.json' with {type: "json"}
-import filesData from '../filesDB.json' with {type: "json"}
-import usersData from '../usersDB.json' with {type: "json"}
-import validateIdMiddleWare from "../middlewares/validateIdMiddleWare.js";
+import directoriesData from "../directoriesDB.json" with { type: "json" };
+import filesData from "../filesDB.json" with { type: "json" };
+import validateIdMiddleware from "../middlewares/validateIdMiddleware.js";
 import { Db, ObjectId } from "mongodb";
-
 
 const router = express.Router();
 
-// Use of req.param()
-// router.param('parentDirId', validateIdMiddleWare)
-// router.param('id', validateIdMiddleWare)
+router.param("parentDirId", validateIdMiddleware);
+router.param("id", validateIdMiddleware);
 
 // Read
 router.get("/:id?", async (req, res) => {
   const db = req.db;
+  const dirCollection = db.collection("directories");
   const user = req.user;
-  const id = req.params.id || user.rootDirId;
-
-  const dirCollection = db.collection('directories')
-
-  // Find the directory and verify ownership
-  const directoryData = await dirCollection.findOne({_id: new ObjectId(id)});
-
-  console.log(directoryData);
-  // return;
-
+  const _id = req.params.id ? new ObjectId(req.params.id) : user.rootDirId;
+  const directoryData = await dirCollection.findOne({ _id });
   if (!directoryData) {
-    return res.status(404).json({ error: "Directory not found or you do not have access to it!" });
+    return res
+      .status(404)
+      .json({ error: "Directory not found or you do not have access to it!" });
   }
 
-  const files = [];
-  const directories = await dirCollection.find({ parentDirId: new ObjectId(id)}).toArray();
-
-  return res.status(200).json({ ...directoryData, files, directories: directories.map((dir) => ({...dir, id: dir._id})) });
+  const files = await db
+    .collection("files")
+    .find({ parentDirId: directoryData._id })
+    .toArray();
+  const directories = await dirCollection.find({ parentDirId: _id }).toArray();
+  return res.status(200).json({
+    ...directoryData,
+    files: files.map((dir) => ({ ...dir, id: dir._id })),
+    directories: directories.map((dir) => ({ ...dir, id: dir._id })),
+  });
 });
 
 router.post("/:parentDirId?", async (req, res, next) => {
+  const user = req.user;
   const db = req.db;
-  const user = req.user
-  const dirCollection = db.collection("directories")
+  const dirCollection = db.collection("directories");
 
-
-  const parentDirId = req.params.parentDirId || user.rootDirId
-  const dirname = req.headers.dirname || 'New Folder'
-  
-
+  const parentDirId = req.params.parentDirId || user.rootDirId;
+  const dirname = req.headers.dirname || "New Folder";
   try {
-    const parentDir = await dirCollection.findOne({_id: new ObjectId(parentDirId)})
+    const parentDir = await dirCollection.findOne({
+      _id: new Object(parentDirId),
+    });
 
-  if(!parentDir) return res.status(404).json({message: "Parent Directory Does not exist!"})
+    if (!parentDir)
+      return res
+        .status(404)
+        .json({ message: "Parent Directory Does not exist!" });
 
     await dirCollection.insertOne({
-    name: dirname,
-    parentDirId,
-    userId: user._id,
-   })
+      name: dirname,
+      parentDirId,
+      userId: user._id,
+    });
 
-    return res.status(200).json({ message: "Directory Created!" })
+    return res.status(200).json({ message: "Directory Created!" });
   } catch (err) {
-    next(err)
+    next(err);
   }
 });
 
-router.patch('/:id', async (req, res, next) => {
-  const db = req.db;
+router.patch("/:id", async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
   const { newDirName } = req.body;
-
+  const db = req.db;
   const dirCollection = db.collection("directories");
-
   try {
-    const a = await dirCollection.updateOne({_id: new ObjectId(id), userId: user._id}, {$set: {name: newDirName}})
-
+    await dirCollection.updateOne(
+      {
+        _id: new ObjectId(id),
+        userId: user._id,
+      },
+      { $set: { name: newDirName } }
+    );
     res.status(200).json({ message: "Directory Renamed!" });
   } catch (err) {
     next(err);
   }
 });
 
-
 router.delete("/:id", async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
 
-  const dirIndex = directoriesData.findIndex((directory) => directory.id === id);
-  if (dirIndex === -1) return res.status(404).json({ message: "Directory not found!" });
+  const dirIndex = directoriesData.findIndex(
+    (directory) => directory.id === id
+  );
+  if (dirIndex === -1)
+    return res.status(404).json({ message: "Directory not found!" });
 
   const directoryData = directoriesData[dirIndex];
 
   // Check if the directory belongs to the user
   if (directoryData.userId !== user.id) {
-    return res.status(403).json({ message: "You are not authorized to delete this directory!" });
+    return res
+      .status(403)
+      .json({ message: "You are not authorized to delete this directory!" });
   }
 
   try {
@@ -115,20 +122,23 @@ router.delete("/:id", async (req, res, next) => {
     }
 
     // Update parent directory
-    const parentDirData = directoriesData.find((dirData) => dirData.id === directoryData.parentDirId);
+    const parentDirData = directoriesData.find(
+      (dirData) => dirData.id === directoryData.parentDirId
+    );
     if (parentDirData) {
-      parentDirData.directories = parentDirData.directories.filter((dirId) => dirId !== id);
+      parentDirData.directories = parentDirData.directories.filter(
+        (dirId) => dirId !== id
+      );
     }
 
     // Save updated data to the database
-    await writeFile('./filesDB.json', JSON.stringify(filesData));
-    await writeFile('./directoriesDB.json', JSON.stringify(directoriesData));
+    await writeFile("./filesDB.json", JSON.stringify(filesData));
+    await writeFile("./directoriesDB.json", JSON.stringify(directoriesData));
 
     res.status(200).json({ message: "Directory Deleted!" });
   } catch (err) {
     next(err);
   }
 });
-
 
 export default router;

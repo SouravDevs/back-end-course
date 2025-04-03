@@ -1,19 +1,16 @@
 import { MongoClient } from "mongodb";
 
-const url = "mongodb://localhost:27017/storageApp";
-
-const client = new MongoClient(url);
-
+const client = new MongoClient("mongodb://127.0.0.1:27017/storageApp");
 
 export async function connectDB() {
-    
-    const db = client.db();
-    await client.connect();
-    return db;
+  await client.connect();
+  const db = client.db();
+  console.log("Database connected");
+  return db;
 }
 
 process.on("SIGINT", async () => {
-    await client.close()
-    console.log("Client Disconnected");
-    process.exit(0)
-})
+  await client.close();
+  console.log("Client Disconnected!");
+  process.exit(0);
+});
