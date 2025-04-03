@@ -1,9 +1,8 @@
 import express from "express";
-import { rm, writeFile } from "fs/promises";
-import directoriesData from "../directoriesDB.json" with { type: "json" };
-import filesData from "../filesDB.json" with { type: "json" };
+import { rm } from "fs/promises";
 import validateIdMiddleware from "../middlewares/validateIdMiddleware.js";
 import { Db, ObjectId } from "mongodb";
+
 
 const router = express.Router();
 
@@ -40,11 +39,11 @@ router.post("/:parentDirId?", async (req, res, next) => {
   const db = req.db;
   const dirCollection = db.collection("directories");
 
-  const parentDirId = req.params.parentDirId || user.rootDirId;
+  const parentDirId = req.params.parentDirId ? new ObjectId(req.params.parentDirId) : user.rootDirId;
   const dirname = req.headers.dirname || "New Folder";
   try {
     const parentDir = await dirCollection.findOne({
-      _id: new Object(parentDirId),
+      _id: parentDirId,
     });
 
     if (!parentDir)
@@ -85,60 +84,56 @@ router.patch("/:id", async (req, res, next) => {
 });
 
 router.delete("/:id", async (req, res, next) => {
-  const user = req.user;
+  const db = req.db;
   const { id } = req.params;
 
-  const dirIndex = directoriesData.findIndex(
-    (directory) => directory.id === id
-  );
-  if (dirIndex === -1)
-    return res.status(404).json({ message: "Directory not found!" });
+  const filesCollection = db.collection('files');
+  const dirCollection = db.collection('directories');
 
-  const directoryData = directoriesData[dirIndex];
+  const dirObjId = new ObjectId(id);
 
-  // Check if the directory belongs to the user
-  if (directoryData.userId !== user.id) {
-    return res
-      .status(403)
-      .json({ message: "You are not authorized to delete this directory!" });
+  // Check user is valid user or not with valid _id
+  const directoryDirData = await dirCollection.
+    findOne({ _id: dirObjId, userId: req.user._id}, { projection: { _id: 1}})
+
+  console.log(directoryDirData)
+
+  if(!directoryDirData) {
+    return res.status(404).json({ error: "Directory not found."})
+ }
+
+
+  const { files, directories } = await getDirectoryContents(dirObjId)
+
+
+  // Delete all files from storage folder
+   for (const { _id, extension } of files) {
+   await rm(`./storage/${_id.toString()}${extension}`)
   }
 
-  try {
-    // Remove directory from the database
-    directoriesData.splice(dirIndex, 1);
+  // Delete all documents from filesCollection & dirCollection
+  await filesCollection.deleteMany({ _id: { $in: files.map(({ _id }) => _id )}})
+  await dirCollection.deleteMany({ _id: { $in: [...directories.map(({ _id }) => _id ), dirObjId]}})
 
-    // Delete all associated files
-    for await (const fileId of directoryData.files) {
-      const fileIndex = filesData.findIndex((file) => file.id === fileId);
-      const fileData = filesData[fileIndex];
-      await rm(`./storage/${fileId}${fileData.extension}`);
-      filesData.splice(fileIndex, 1);
-    }
+  return res.json({message: "File deleted successfully"})
 
-    // Delete all child directories
-    for await (const dirId of directoryData.directories) {
-      const childDirIndex = directoriesData.findIndex(({ id }) => id === dirId);
-      directoriesData.splice(childDirIndex, 1);
-    }
-
-    // Update parent directory
-    const parentDirData = directoriesData.find(
-      (dirData) => dirData.id === directoryData.parentDirId
-    );
-    if (parentDirData) {
-      parentDirData.directories = parentDirData.directories.filter(
-        (dirId) => dirId !== id
-      );
-    }
-
-    // Save updated data to the database
-    await writeFile("./filesDB.json", JSON.stringify(filesData));
-    await writeFile("./directoriesDB.json", JSON.stringify(directoriesData));
-
-    res.status(200).json({ message: "Directory Deleted!" });
-  } catch (err) {
-    next(err);
-  }
+ 
 });
+
+async function getDirectoryContents(id) {
+    
+  let files = await filesCollection.find({ parentDirId:  id}, { projection: { extension: 1 }}).toArray()
+  let directories = await dirCollection.find({ parentDirId:  id}, { projection: { _id: 1 }}).toArray()
+
+
+  for (const { _id, name } of directories) {
+   const { files: childFiles, directories: childDirectories } =  await getDirectoryContents(new ObjectId(_id))
+
+   files = [...files, ...childFiles]
+   directories = [...directories, ...childDirectories]
+  }
+
+  return { files, directories }
+  }
 
 export default router;
