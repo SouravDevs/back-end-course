@@ -20,14 +20,14 @@ router.post("/register", async (req, res, next) => {
     const userId = new ObjectId();
 
     const dirCollection = db.collection("directories");
-    const userRootDir = await dirCollection.insertOne({
+     await dirCollection.insertOne({
       _id: rootDirId,
       name: `root-${email}`,
       parentDirId: null,
       userId
     });
 
-    const createdUser = await db.collection("users").insertOne({
+    await db.collection("users").insertOne({
       _id: userId,
       name,
       email,
@@ -38,6 +38,9 @@ router.post("/register", async (req, res, next) => {
 
     res.status(201).json({ message: "User Registered" });
   } catch (err) {
+    if(err.code === 121) {
+    res.status(400).json({ error: "Invalid input, please enter valid details" });
+    }
     next(err);
   }
 });
