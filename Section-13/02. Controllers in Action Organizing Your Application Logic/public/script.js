@@ -1,4 +1,4 @@
-const buttons = document.querySelectorAll("button");
+const buttons = document.querySelectorAll("li button");
 
 buttons.forEach((button) => {
     button.addEventListener("click", async () => {
