@@ -1,0 +1,27 @@
+{
+  "name": "47.-finding-invalid-documents-in-a-collection",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "bson": "^6.10.3",
+    "latest": "^0.2.0",
+    "memory-pager": "^1.5.0",
+    "mongodb": "^6.15.0",
+    "mongodb-connection-string-url": "^3.0.2",
+    "npm": "^2.15.12",
+    "punycode": "^2.3.1",
+    "sparse-bitfield": "^3.0.3",
+    "tr46": "^5.1.0",
+    "webidl-conversions": "^7.0.0",
+    "whatwg-url": "^14.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

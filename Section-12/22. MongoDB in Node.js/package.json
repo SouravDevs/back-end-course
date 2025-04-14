@@ -1,14 +1,16 @@
 {
-  "name": "anurag-singh-sir",
+  "name": "22.-mongodb-in-node",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "mongodb": "6.15"
   }
 }

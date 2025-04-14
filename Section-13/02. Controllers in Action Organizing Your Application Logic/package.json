@@ -1,0 +1,19 @@
+{
+  "name": "02.-controllers-in-action-organizing-your-application-logic",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express-react-views": "^0.11.0",
+    "mongoose": "^8.13.2",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0"
+  }
+}

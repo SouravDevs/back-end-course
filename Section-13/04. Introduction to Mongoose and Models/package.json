@@ -1,0 +1,16 @@
+{
+  "name": "04.-introduction-to-mongoose-and-models",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "mongoose": "^8.13.2"
+  }
+}

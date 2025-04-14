@@ -14,8 +14,8 @@ const todosCollection = db.getCollection('todos');
 // db.getCollection('todos').insertOne({title: "Learn TypeScript", completed: false})
 
 for (let i = 0; i <= 10; i++) {
-    todosCollection.insertOne({ 
-        title: `Task : ${i}`, completed: i % 2 === 0 ? true : false 
+    todosCollection.insertOne({
+        title: `Task : ${i}`, completed: i % 2 === 0 ? true : false
     })
 }
 

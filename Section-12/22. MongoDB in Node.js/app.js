@@ -9,4 +9,5 @@ const admin = client.db().admin();
 const allDatabases = await admin.listDatabases()
 console.log(allDatabases);
 
+
 client.close() // Close the connection
