@@ -4,10 +4,13 @@ import path from "path";
 import { ObjectId } from "mongodb";
 
 export const uploadFile = async (req, res, next) => {
+
   const db = req.db;
   const dirCollection = db.collection("directories");
   const filesCollection = await db.collection("files");
+
   const parentDirId = req.params.parentDirId || req.user.rootDirId;
+
   const parentDirData = await dirCollection.findOne({
     _id: new ObjectId(parentDirId),
     userId: req.user._id,
@@ -27,6 +30,7 @@ export const uploadFile = async (req, res, next) => {
     parentDirId: parentDirData._id,
     userId: req.user._id,
   });
+
   const fileId = insertedFile.insertedId.toString();
 
   const fullFileName = `${fileId}${extension}`;
@@ -47,11 +51,15 @@ export const uploadFile = async (req, res, next) => {
 export const getFile = async (req, res) => {
   const { id } = req.params;
   const db = req.db;
+
   const filesCollection = db.collection("files");
+
   const fileData = await filesCollection.findOne({
     _id: new ObjectId(id),
     userId: req.user._id,
   });
+
+
   // Check if file exists
   if (!fileData) {
     return res.status(404).json({ error: "File not found!" });
@@ -75,7 +83,9 @@ export const getFile = async (req, res) => {
 export const renameFile = async (req, res, next) => {
   const { id } = req.params;
   const db = req.db;
+
   const filesCollection = db.collection("files");
+
   const fileData = await filesCollection.findOne({
     _id: new ObjectId(id),
     userId: req.user._id,
@@ -91,6 +101,7 @@ export const renameFile = async (req, res, next) => {
       { _id: new ObjectId(id) },
       { $set: { name: req.body.newFilename } }
     );
+
     return res.status(200).json({ message: "Renamed" });
   } catch (err) {
     err.status = 500;
@@ -101,7 +112,9 @@ export const renameFile = async (req, res, next) => {
 export const deleteFile = async (req, res, next) => {
   const { id } = req.params;
   const db = req.db;
+
   const filesCollection = db.collection("files");
+
   const fileData = await filesCollection.findOne({
     _id: new ObjectId(id),
     userId: req.user._id,
@@ -113,6 +126,7 @@ export const deleteFile = async (req, res, next) => {
 
   try {
     await rm(`./storage/${id}${fileData.extension}`);
+
     await filesCollection.deleteOne({ _id: fileData._id });
     return res.status(200).json({ message: "File Deleted Successfully" });
   } catch (err) {

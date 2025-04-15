@@ -4,7 +4,9 @@ import { client } from "../config/db.js";
 export const register = async (req, res, next) => {
   const { name, email, password } = req.body;
   const db = req.db;
+
   const foundUser = await db.collection("users").findOne({ email });
+
   if (foundUser) {
     return res.status(409).json({
       error: "User already exists",
@@ -12,6 +14,7 @@ export const register = async (req, res, next) => {
         "A user with this email address already exists. Please try logging in or use a different email.",
     });
   }
+  
   const session = client.startSession();
 
   try {

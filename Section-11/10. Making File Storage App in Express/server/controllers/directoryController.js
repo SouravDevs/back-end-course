@@ -5,7 +5,9 @@ import File from "../models/fileModel.js";
 export const getDirectory = async (req, res) => {
   const user = req.user;
   const _id = req.params.id || user.rootDirId.toString();
+
   const directoryData = await Directory.findOne({ _id }).lean();
+
   if (!directoryData) {
     return res
       .status(404)
@@ -14,6 +16,8 @@ export const getDirectory = async (req, res) => {
 
   const files = await File.find({ parentDirId: directoryData._id }).lean();
   const directories = await Directory.find({ parentDirId: _id }).lean();
+
+
   return res.status(200).json({
     ...directoryData,
     files: files.map((dir) => ({ ...dir, id: dir._id })),
@@ -26,15 +30,19 @@ export const createDirectory = async (req, res, next) => {
 
   const parentDirId = req.params.parentDirId || user.rootDirId.toString();
   const dirname = req.headers.dirname || "New Folder";
+
+
   try {
     const parentDir = await Directory.findOne({
       _id: parentDirId,
     }).lean();
 
+
     if (!parentDir)
       return res
         .status(404)
         .json({ message: "Parent Directory Does not exist!" });
+
 
     await Directory.insertOne({
       name: dirname,
@@ -58,6 +66,8 @@ export const renameDirectory = async (req, res, next) => {
   const user = req.user;
   const { id } = req.params;
   const { newDirName } = req.body;
+
+
   try {
     await Directory.findOneAndUpdate(
       {
@@ -76,6 +86,7 @@ export const deleteDirectory = async (req, res, next) => {
   const { id } = req.params;
 
   try {
+
     const directoryData = await Directory.findOne({
       _id: id,
       userId: req.user._id,
@@ -91,6 +102,7 @@ export const deleteDirectory = async (req, res, next) => {
       let files = await File.find({ parentDirId: id })
         .select("extension")
         .lean();
+        
       let directories = await Directory.find({ parentDirId: id })
         .select("_id")
         .lean();
