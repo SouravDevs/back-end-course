@@ -28,6 +28,7 @@ const userSchema = new Schema(
            lowercase: true,
            trim: true
         },
+        password: String,
         hobbies: {
             type: [String]
         },
@@ -107,9 +108,14 @@ const userSchema = new Schema(
 // }
 
 
-userSchema.pre('find', function (next) {
-    console.log("Running my query middleware");
-    console.log(this);
+userSchema.pre('save', function (next) {
+    console.log("Running my document middleware");
+    this.password = this.name + this.age
+    next()
+})
+
+userSchema.post('save', function (doc) {
+    console.log(`Your account created successfully and your password is ${doc.password}`);
 })
 
 const User = model("User", userSchema);
