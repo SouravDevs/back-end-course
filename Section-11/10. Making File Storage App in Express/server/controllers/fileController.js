@@ -31,6 +31,7 @@ export const uploadFile = async (req, res, next) => {
     userId: req.user._id,
   });
 
+
   const fileId = insertedFile.insertedId.toString();
 
   const fullFileName = `${fileId}${extension}`;
@@ -43,6 +44,7 @@ export const uploadFile = async (req, res, next) => {
   });
 
   req.on("error", async () => {
+    await rm(`./storage/${fileId}${extension}`);
     await filesCollection.deleteOne({ _id: insertedFile.insertedId });
     return res.status(404).json({ message: "Could not Upload File" });
   });
