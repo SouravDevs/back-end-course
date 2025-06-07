@@ -4,7 +4,7 @@ import User from "./UserModel.js";
 
 // const user = await User.find({ email: "ramesh@gmail.com"})
 
-const user = new User({ name: "Aman", age: 30, email: "aman@gmail.com"})
-await user.save()
+const user = await User.findOne({name: "Aman"})
+console.log(user);
 
 await mongoose.disconnect()

@@ -108,15 +108,30 @@ const userSchema = new Schema(
 // }
 
 
-userSchema.pre('save', function (next) {
-    console.log("Running my document middleware");
-    this.password = this.name + this.age
-    next()
-})
+//  Document middleware //
+// userSchema.pre('save', function (next) {
+//     console.log("Running my document middleware");
+//     this.password = this.name + this.age
+//     next()
+// })
 
-userSchema.post('save', function (doc) {
-    console.log(`Your account created successfully and your password is ${doc.password}`);
-})
+// userSchema.post('save', function (doc) {
+//     console.log(`Your account created successfully and your password is ${doc.password}`);
+// })
+
+//  Query Middleware   //
+// userSchema.pre(['find', 'findOne'], function () {
+//     this.find({ age: { $gte: 50}})
+// })
+
+userSchema.pre(/^find/, function () {
+        this.find({ age: { $gte: 50}})
+    })
+
+    userSchema.post(/^find/, function (doc) {
+        console.log(doc);
+        console.log(`Hii`);
+    })
 
 const User = model("User", userSchema);
 
