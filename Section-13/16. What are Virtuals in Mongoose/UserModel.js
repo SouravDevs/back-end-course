@@ -79,6 +79,14 @@ const userSchema = new Schema(
                 }
                 return `${this.name} is ${this.age} years old.`
             }
+        },
+        statics: {
+            findOneByName(name) {
+               return this.findOne({name})
+            },
+            findOneByEmail(email) {
+                return this.findOne({email})
+            }
         }
     }
 )
@@ -90,6 +98,11 @@ const userSchema = new Schema(
 
 // Another way to create a method   //
 // userSchema.methods.getAge = function() {
+
+// }
+
+//  Another way to create a static  //
+// userSchema.static.findOneByEmail = function() {
 
 // }
 
