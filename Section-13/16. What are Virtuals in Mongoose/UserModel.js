@@ -71,15 +71,27 @@ const userSchema = new Schema(
         },
         toObject: {
             virtuals: true
+        },
+        methods: {
+            getSummary(option) {
+                if(option === 'full') {
+                    return `${this.name} is ${this.age} years old and he is ${ this.isAdult ? 'adult' : 'not adult'}`
+                }
+                return `${this.name} is ${this.age} years old.`
+            }
         }
-
     }
 )
 
-//  Another way of create a virtuals    //
+//  Another way to create a virtuals    //
 // userSchema.virtual('emailDomain').get(function() {
 //     return this.email.split('@')[1]
 // })
+
+// Another way to create a method   //
+// userSchema.methods.getAge = function() {
+
+// }
 
 const User = model("User", userSchema);
 

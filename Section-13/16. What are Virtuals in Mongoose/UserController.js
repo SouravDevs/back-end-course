@@ -3,19 +3,10 @@ import User from "./UserModel.js";
 
 
 const user = await User.findOne({ email: "sourav@gmail.com"})
-user.hobbiesString = "TT, Football"
 
-// console.log(user.toJSON({ virtuals: true }));
-// console.log(user.schema.virtuals);
+const user1 = new User();
 
-// console.log(user.isAdult);
-// console.log(user.hobbiesString);
-// console.log(user.domain);
-
-// console.log(user.hobbiesString);
-
-// await user.save()
-
-console.log(user.emailDomain);
+console.log(user.getSummary('full'));
+console.log(user1.getSummary());
 
 await mongoose.disconnect()
