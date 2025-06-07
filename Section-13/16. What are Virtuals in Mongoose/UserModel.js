@@ -106,6 +106,12 @@ const userSchema = new Schema(
 
 // }
 
+
+userSchema.pre('find', function (next) {
+    console.log("Running my query middleware");
+    console.log(this);
+})
+
 const User = model("User", userSchema);
 
 export default User
