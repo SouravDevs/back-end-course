@@ -119,19 +119,36 @@ const userSchema = new Schema(
 //     console.log(`Your account created successfully and your password is ${doc.password}`);
 // })
 
+
+
 //  Query Middleware   //
 // userSchema.pre(['find', 'findOne'], function () {
 //     this.find({ age: { $gte: 50}})
 // })
 
-userSchema.pre(/^find/, function () {
-        this.find({ age: { $gte: 50}})
-    })
 
-    userSchema.post(/^find/, function (doc) {
-        console.log(doc);
-        console.log(`Hii`);
-    })
+
+// userSchema.pre(/^find/, function () {
+//         this.find({ age: { $gte: 50}})
+//     })
+
+//     userSchema.post(/^find/, function (doc) {
+//         console.log(doc);
+//         console.log(`Hii`);
+//     })
+
+
+
+
+//     Model Middleware     //
+userSchema.pre('insertMany', function (next, docs) {
+    for(const doc of docs) {
+        doc.password = doc.name + doc.age
+    }
+    console.log("Running insertMany Middleware");
+    next()
+})
+
 
 const User = model("User", userSchema);
 
