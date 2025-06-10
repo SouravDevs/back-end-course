@@ -29,6 +29,7 @@ const userSchema = new Schema(
            trim: true
         },
         password: String,
+        balance: Number,
         hobbies: {
             type: [String]
         },
@@ -45,6 +46,8 @@ const userSchema = new Schema(
      {
         strict: "throw", // true, false, throw -> by Default = true
         timestamps: true,
+        optimisticConcurrency: true,
+        // versionKey: false,
         // versionKey: "__version",
         // collection: "user", // This collection name will override and won't pluralize,
         virtuals: {
@@ -88,66 +91,10 @@ const userSchema = new Schema(
             findOneByEmail(email) {
                 return this.findOne({email})
             }
-        }
+        },
+
     }
 )
-
-//  Another way to create a virtuals    //
-// userSchema.virtual('emailDomain').get(function() {
-//     return this.email.split('@')[1]
-// })
-
-// Another way to create a method   //
-// userSchema.methods.getAge = function() {
-
-// }
-
-//  Another way to create a static  //
-// userSchema.static.findOneByEmail = function() {
-
-// }
-
-
-//  Document middleware //
-// userSchema.pre('save', function (next) {
-//     console.log("Running my document middleware");
-//     this.password = this.name + this.age
-//     next()
-// })
-
-// userSchema.post('save', function (doc) {
-//     console.log(`Your account created successfully and your password is ${doc.password}`);
-// })
-
-
-
-//  Query Middleware   //
-// userSchema.pre(['find', 'findOne'], function () {
-//     this.find({ age: { $gte: 50}})
-// })
-
-
-
-// userSchema.pre(/^find/, function () {
-//         this.find({ age: { $gte: 50}})
-//     })
-
-//     userSchema.post(/^find/, function (doc) {
-//         console.log(doc);
-//         console.log(`Hii`);
-//     })
-
-
-
-
-//     Model Middleware     //
-userSchema.pre('insertMany', function (next, docs) {
-    for(const doc of docs) {
-        doc.password = doc.name + doc.age
-    }
-    console.log("Running insertMany Middleware");
-    next()
-})
 
 
 const User = model("User", userSchema);
