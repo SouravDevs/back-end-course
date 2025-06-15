@@ -1,5 +1,8 @@
 import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
+import crypto from 'crypto'
+
+export const mySecretKey = "Procodrr-storageApp-123$#";
 
 export const register = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -57,7 +60,21 @@ export const login = async (req, res, next) => {
   if (!user) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
-  res.cookie("uid", user._id.toString() + Math.round((Date.now() / 1000 + 10)).toString(16), {
+
+  const cookiePayload = JSON.stringify({
+    id: user._id.toString(),
+    expiry: Math.round(Date.now() / 1000 + 60)
+  })
+
+  const signature = crypto.createHash('sha-256')
+  .update(mySecretKey)
+  .update(cookiePayload)
+  .update(mySecretKey)
+  .digest('base64url')
+
+  const signedCookiePayload = `${Buffer.from(cookiePayload).toString('base64url')}.${signature}`
+
+  res.cookie("token", signedCookiePayload, {
     httpOnly: true,
     maxAge: 60 * 1000 * 60 * 24 * 7,
   });
@@ -72,6 +89,6 @@ export const getCurrentUser = (req, res) => {
 };
 
 export const logout = (req, res) => {
-  res.clearCookie("uid");
+  res.clearCookie("token");
   res.status(204).end();
 };
