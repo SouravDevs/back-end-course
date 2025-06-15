@@ -9,6 +9,10 @@ export const register = async (req, res, next) => {
 
   const foundUser = await User.findOne({ email }).lean()
 
+  const hashedPassword = crypto.createHash('sha256')
+  .update(password)
+  .digest('hex')
+
 
   try {
     const rootDirId = new ObjectId();
@@ -29,7 +33,7 @@ export const register = async (req, res, next) => {
         _id: userId,
         name,
         email,
-        password,
+        password: hashedPassword,
         rootDirId,
       },
     );
@@ -55,8 +59,16 @@ export const register = async (req, res, next) => {
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
   const db = req.db;
-  const user = await db.collection("users").findOne({ email, password });
+  const user = await db.collection("users").findOne({ email });
   if (!user) {
+    return res.status(404).json({ error: "Invalid Credentials" });
+  }
+
+  const matchedPassword = crypto.createHash('sha256')
+  .update(password)
+  .digest("hex")
+
+  if(user.password !== matchedPassword) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
 
