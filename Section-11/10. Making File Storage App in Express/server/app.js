@@ -8,11 +8,14 @@ import checkAuth from "./middlewares/authMiddleware.js";
 import { connectDB } from "./config/db.js";
 import './config/mongoose.js'
 
+
+const mySecretKey = "Procodrr-storageApp-123$#";
+
 try {
   const db = await connectDB();
 
   const app = express();
-  app.use(cookieParser());
+  app.use(cookieParser(mySecretKey));
   app.use(express.json());
   app.use(
     cors({

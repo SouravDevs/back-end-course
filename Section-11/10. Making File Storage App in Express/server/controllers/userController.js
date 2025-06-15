@@ -2,7 +2,6 @@ import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
 import crypto from 'crypto'
 
-export const mySecretKey = "Procodrr-storageApp-123$#";
 
 export const register = async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -66,16 +65,9 @@ export const login = async (req, res, next) => {
     expiry: Math.round(Date.now() / 1000 + 60)
   })
 
-  const signature = crypto.createHash('sha-256')
-  .update(mySecretKey)
-  .update(cookiePayload)
-  .update(mySecretKey)
-  .digest('base64url')
-
-  const signedCookiePayload = `${Buffer.from(cookiePayload).toString('base64url')}.${signature}`
-
-  res.cookie("token", signedCookiePayload, {
+  res.cookie("token", Buffer.from(cookiePayload).toString('base64url'), {
     httpOnly: true,
+    signed: true,
     maxAge: 60 * 1000 * 60 * 24 * 7,
   });
   res.json({ message: "logged in" });
