@@ -5,12 +5,15 @@ import courseRoutes from "./routes/courses.js";
 import cartRoutes from "./routes/cart.js";
 import authRoutes from "./routes/auth.js";
 import { seedDatabase } from "./seed.js";
+import cookieParser from "cookie-parser";
 
 await connectDB();
 await seedDatabase();
 
 const app = express();
 const PORT = 4000;
+
+app.use(cookieParser("my-secret-1234@#$"))
 
 // Middleware
 app.use(
