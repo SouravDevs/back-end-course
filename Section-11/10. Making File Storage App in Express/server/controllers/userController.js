@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
+import Session from "../models/session.model.js";
 import crypto from 'crypto'
 
 
@@ -72,12 +73,9 @@ export const login = async (req, res, next) => {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
 
-  const cookiePayload = JSON.stringify({
-    id: user._id.toString(),
-    expiry: Math.round(Date.now() / 1000 + 60)
-  })
+  const session = await Session.create({userId: user._id})
 
-  res.cookie("token", Buffer.from(cookiePayload).toString('base64url'), {
+  res.cookie("sid", session.id, {
     httpOnly: true,
     signed: true,
     maxAge: 60 * 1000 * 60 * 24 * 7,

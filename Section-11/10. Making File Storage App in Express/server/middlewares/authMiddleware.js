@@ -1,30 +1,23 @@
 import { ObjectId } from "mongodb";
-import crypto from 'crypto'
+import Session from '../models/session.model.js'
+import User from "../models/userModel.js";
 
 export default async function checkAuth(req, res, next) {
-  console.log('Signed : ',req.signedCookies);
-  console.log("Normal : ",req.cookies);
 
-  const { token } = req.signedCookies;
-  const db = req.db;
+  const { sid } = req.signedCookies;
 
-
-  if (!token) {
+  if (!sid) {
+    res.clearCookie('sid')
     return res.status(401).json({ error: "Not logged!" });
   }
 
+  const session = await Session.findById(sid);
 
-  const { id, expiry: expiryTimeInSeconds } = JSON.parse(Buffer.from(token, 'base64url').toString())
-
-
-  const currentTimeInSeconds = Math.round(Date.now() / 1000)
-
-  if(currentTimeInSeconds > expiryTimeInSeconds) {
-     res.clearCookie("token");
-    return res.status(204).json({error: "Session expired"});
+  if(!session) {
+    return res.status(401).json({ error: "Not logged!" });
   }
 
-  const user = await db.collection("users").findOne({ _id: new ObjectId(id) });
+  const user = await User.findOne()
   if (!user) {
     return res.status(401).json({ error: "Not logged!" });
   }
