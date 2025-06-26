@@ -10,6 +10,10 @@ export const register = async (req, res, next) => {
 
   const foundUser = await User.findOne({ email }).lean()
 
+  if(foundUser) {
+    return res.status(201).json({error: "email is already taken"})
+  }
+
   const hashedPassword = crypto.createHash('sha256')
   .update(password)
   .digest('hex')
@@ -59,8 +63,8 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
-  const db = req.db;
-  const user = await db.collection("users").findOne({ email });
+
+  const user = await User.findOne({ email });
   if (!user) {
     return res.status(404).json({ error: "Invalid Credentials" });
   }
@@ -71,6 +75,12 @@ export const login = async (req, res, next) => {
 
   if(user.password !== matchedPassword) {
     return res.status(404).json({ error: "Invalid Credentials" });
+  }
+
+  const allSessions = await Session.find({ userId: user.id })
+
+  if(allSessions.length >= 2) {
+    await allSessions[0].deleteOne()
   }
 
   const session = await Session.create({userId: user._id})
@@ -90,7 +100,11 @@ export const getCurrentUser = (req, res) => {
   });
 };
 
-export const logout = (req, res) => {
-  res.clearCookie("token");
+export const logout = async(req, res) => {
+  const { sid } = req.signedCookies;
+  // Delete logout session from database
+  await Session.findByIdAndDelete(sid);
+
+  res.clearCookie("sid");
   res.status(204).end();
 };
