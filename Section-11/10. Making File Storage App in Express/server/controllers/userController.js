@@ -2,11 +2,22 @@ import { ObjectId } from "mongodb";
 import User from "../models/userModel.js";
 import Session from "../models/session.model.js";
 import crypto from 'crypto'
+import mongoose from "mongoose";
+import { OTP } from "../models/otp.model.js";
 
 
 export const register = async (req, res, next) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, otp } = req.body;
   const db = req.db;
+
+    const otpRecord = await OTP.findOne({email, otp});
+    if(!otpRecord) {
+       return res.status(400).json({error: "Invalid or Expired OTP"})
+    }
+
+
+  // Create a mongoose session
+  const session = await mongoose.startSession();
 
   const foundUser = await User.findOne({ email }).lean()
 
@@ -23,6 +34,8 @@ export const register = async (req, res, next) => {
     const rootDirId = new ObjectId();
     const userId = new ObjectId();
     const dirCollection = db.collection("directories");
+
+      session.startTransaction();
 
     await dirCollection.insertOne(
       {
@@ -43,8 +56,11 @@ export const register = async (req, res, next) => {
       },
     );
 
+   await otpRecord.deleteOne()
+    session.commitTransaction();
     res.status(201).json({ message: "User Registered" });
   } catch (err) {
+    session.abortTransaction();
     if (err.code === 121) {
       res
         .status(400)
