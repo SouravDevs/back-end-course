@@ -1,5 +1,6 @@
-
-const redirectUrl = `http://localhost:5500`
+const clientId = ''
+const clientSecret = ``
+const redirectUrl = 'http://localhost:5500/callback.html'
 
 const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
 
@@ -12,14 +13,6 @@ button.addEventListener('click', () => {
 window.addEventListener('message', ({ data }) => {
    fetchIdToken(data.code)
 })
-
-if (window.name === 'auth-popup') {
-    const code = new URLSearchParams(location.search).get('code')
-    if (code) {
-        window.opener.postMessage({ code })
-        window.close()
-    }
-}
 
 
 async function fetchIdToken(code) {
