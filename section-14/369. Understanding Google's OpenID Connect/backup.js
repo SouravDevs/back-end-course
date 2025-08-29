@@ -1,28 +1,14 @@
+const code = new URLSearchParams(location.search).get('code')
 
 const redirectUrl = `http://localhost:5500`
 
-const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
+const authURL =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
 
-const button = document.querySelector('button');
-
-button.addEventListener('click', () => {
-    window.open(authUrl, 'auth-popup', 'left=50,top=50,width=500,height=500')
-})
-
-window.addEventListener('message', ({ data }) => {
-   fetchIdToken(data.code)
-})
-
-if (window.name === 'auth-popup') {
-    const code = new URLSearchParams(location.search).get('code')
-    if (code) {
-        window.opener.postMessage({ code })
-        window.close()
-    }
+if(code) {
+    fetchIdToken()
 }
 
-
-async function fetchIdToken(code) {
+async function fetchIdToken() {
     const payload = new URLSearchParams({
     code: code,
     client_id: clientId,
