@@ -1,6 +1,7 @@
 const nameElement = document.querySelector('#name')
 const emailElement = document.querySelector('#email')
 const imageElement = document.createElement('img')
+const logoutButton = document.querySelector('button')
 
 const baseURL = "http://localhost:4000"
 
@@ -15,6 +16,17 @@ const response = await fetch(`${baseURL}/profile`, {
   const {name: fullName, email, picture} = await response.json()
   nameElement.textContent = fullName
   emailElement.textContent = email
-  imageElement.src = picture
+  // imageElement.src = picture
 
-  document.body.appendChild(imageElement)
+  // document.body.appendChild(imageElement)
+
+  logoutButton.addEventListener('click', async () => {
+      const response = await fetch(`${baseURL}/logout`, {
+        method: "POST",
+        credentials: 'include'
+      })
+
+      if(response.status === 204) {
+          location.href = '/login'
+      }
+  })

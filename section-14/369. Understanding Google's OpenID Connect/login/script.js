@@ -27,9 +27,7 @@ window.addEventListener('message', async ({ data }) => {
   console.log(responseData);
 
   if(responseData) {
-    location.href = '/'
+    location.href = 'http://localhost:5500'
   }
 })
-
-
 
