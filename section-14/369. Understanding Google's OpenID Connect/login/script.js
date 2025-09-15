@@ -1,10 +1,7 @@
-const clientId = ''
-const clientSecret = ``
-const redirectUrl = 'http://localhost:5500/callback.html'
+const clientId = '725466307018-gkjq39d9boupnvctbt3milq6hfn4qa65.apps.googleusercontent.com'
+const redirectUrl = 'http://localhost:4000/auth/google/callback'
 
 const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
-
-const baseURL = "http://localhost:4000"
 
 const button = document.querySelector('button');
 
@@ -13,21 +10,6 @@ button.addEventListener('click', () => {
 })
 
 window.addEventListener('message', async ({ data }) => {
-  console.log(data.code);
-  const response =  await fetch(`${baseURL}/auth/google/callback`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data),
-    credentials: 'include'
-  })
-
-  const responseData = await response.json()
-  console.log(responseData);
-
-  if(responseData) {
-    location.href = 'http://localhost:5500'
-  }
+  if(data.message === "success") location.href = 'http://localhost:5500'
 })
 

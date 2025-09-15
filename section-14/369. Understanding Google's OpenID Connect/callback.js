@@ -1,7 +1,13 @@
-if (window.name === 'auth-popup') {
-    const code = new URLSearchParams(location.search).get('code')
-    if (code) {
-        window.opener.postMessage({ code })
+const sid = new URLSearchParams(location.search).get("sid")
+
+if (sid) {
+    const baseUrl = 'http://localhost:4000';
+    const res = await fetch(`${baseUrl}/session-cookie?sid=${sid}`, {
+        credentials: 'include'
+    })
+
+    if (res.status === 200) {
+        window.opener.postMessage({ message: "success" })
         window.close()
     }
 }
