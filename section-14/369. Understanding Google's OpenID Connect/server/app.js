@@ -18,7 +18,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.get('/auth/google', async (req, res) => {
-    const clientId = '725466307018-gkjq39d9boupnvctbt3milq6hfn4qa65.apps.googleusercontent.com'
+    const clientId = ''
     const redirectUrl = 'http://localhost:4000/auth/google/callback'
 
     const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
@@ -70,9 +70,6 @@ app.get('/auth/google/callback', async (req, res) => {
 
 app.get('/session-cookie', async (req, res) => {
     const { sid } = req.query;
-
-    console.log(req.query)
-    console.log(req.url);
 
    res.cookie("sid", sid, {
     maxAge: 1000 * 60 * 60 * 24 * 7,
