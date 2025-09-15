@@ -17,7 +17,7 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json())
 
-app.post('/auth/google/callback', async (req, res) => {
+app.get('/auth/google/callback', async (req, res) => {
     const { sid } = req.cookies;
 
     const existingSession = sessionsDB.find((session) => session.sessionId === sid)
@@ -26,36 +26,22 @@ app.post('/auth/google/callback', async (req, res) => {
         return res.json({ message: "Already logged in"})
     }
 
-    const { code } = req.body;
+    const { code } = req.query;
+
 
     const { sub, email, name, picture } = await fetchUserFromGoogle(code)
-
+    
     const existingUser = usersDB.find(({ id }) => id === sub)
 
     const sessionId = crypto.randomUUID()
 
     if (existingUser) {
-        const existingSessionIndex = sessionsDB.findIndex(( sesision) => sesision.userId === sub)
-
-        if(existingSession === -1) {
         sessionsDB.push({ sessionId, userId: sub })
-        }
-
-        else {
-            sessionsDB[existingSessionIndex].sessionId = sessionId
-        }
-
         await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
 
-        // Set cookie
-        res.cookie('sid', sessionId, {
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            httpOnly: true
-        })
 
-        return res.json(existingUser)
-
-  
+        res.redirect(`http://localhost:5500/callback.html?sid=${sessionId}`)
+        return res.end()
     }
 
     const newUser = { id: sub, email, name, picture }
@@ -67,13 +53,23 @@ app.post('/auth/google/callback', async (req, res) => {
     sessionsDB.push({ sessionId, userId: sub })
     await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
 
-    // Set cookie
-    res.cookie('sid', sessionId, {
-        maxAge: 1000 * 60 * 60 * 24 * 7,
-        httpOnly: true
-    })
 
-    res.json(email)
+    res.redirect(`http://localhost:5500/callback.html?sid=${sessionId}`)
+    return res.end()
+})
+
+app.get('/session-cookie', async (req, res) => {
+    const { sid } = req.query;
+
+    console.log(req.query)
+    console.log(req.url);
+
+   res.cookie("sid", sid, {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    httpOnly: true
+   }) 
+
+   res.end()
 })
 
 app.get('/profile', async (req, res) => {
@@ -100,6 +96,7 @@ app.post('/logout', async (req, res) => {
     sessionsDB.splice(sessionIndex, 1)
 
     await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
+    res.clearCookie('sid')
     res.status(204).end()
 })
 

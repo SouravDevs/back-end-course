@@ -1,6 +1,6 @@
 const clientId = ''
 const clientSecret = ``
-const redirectUrl = 'http://localhost:5500/callback.html'
+const redirectUrl = 'http://localhost:4000/auth/google/callback'
 
 export async function fetchUserFromGoogle(code) {
     const payload = new URLSearchParams({
