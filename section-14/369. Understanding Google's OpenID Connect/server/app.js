@@ -35,7 +35,16 @@ app.post('/auth/google/callback', async (req, res) => {
     const sessionId = crypto.randomUUID()
 
     if (existingUser) {
+        const existingSessionIndex = sessionsDB.findIndex(( sesision) => sesision.userId === sub)
+
+        if(existingSession === -1) {
         sessionsDB.push({ sessionId, userId: sub })
+        }
+
+        else {
+            sessionsDB[existingSessionIndex].sessionId = sessionId
+        }
+
         await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
 
         // Set cookie
@@ -45,6 +54,8 @@ app.post('/auth/google/callback', async (req, res) => {
         })
 
         return res.json(existingUser)
+
+  
     }
 
     const newUser = { id: sub, email, name, picture }
@@ -81,6 +92,15 @@ app.get('/profile', async (req, res) => {
     }
 
     return res.json(existingUser)
+})
+
+app.post('/logout', async (req, res) => {
+    const { sid } = req.cookies;
+    const sessionIndex = sessionsDB.findIndex((session) => session.sessionId === sid)
+    sessionsDB.splice(sessionIndex, 1)
+
+    await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
+    res.status(204).end()
 })
 
 app.listen(PORT, () => {
