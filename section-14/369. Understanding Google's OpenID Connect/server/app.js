@@ -17,6 +17,16 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json())
 
+app.get('/auth/google', async (req, res) => {
+    const clientId = '725466307018-gkjq39d9boupnvctbt3milq6hfn4qa65.apps.googleusercontent.com'
+    const redirectUrl = 'http://localhost:4000/auth/google/callback'
+
+    const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
+
+    res.redirect(authUrl)
+    res.end()
+})
+
 app.get('/auth/google/callback', async (req, res) => {
     const { sid } = req.cookies;
 
