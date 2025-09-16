@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import { fetchUserFromGoogle } from './services/googleAuthService.js';
+import { fetchUserFromGoogle, generateGoogleAuthUrl } from './services/googleAuthService.js';
 import usersDB from './usersDB.json' with { type: "json" }
 import sessionsDB from './sessionsDB.json' with { type: "json" }
 import { writeFile } from 'fs/promises';
@@ -18,12 +18,7 @@ app.use(cookieParser())
 app.use(express.json())
 
 app.get('/auth/google', async (req, res) => {
-    const clientId = ''
-    const redirectUrl = 'http://localhost:4000/auth/google/callback'
-
-    const authUrl =`https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&scope=openid email profile&redirect_uri=${redirectUrl}`
-
-    res.redirect(authUrl)
+    res.redirect(generateGoogleAuthUrl())
     res.end()
 })
 
@@ -48,7 +43,6 @@ app.get('/auth/google/callback', async (req, res) => {
     if (existingUser) {
         sessionsDB.push({ sessionId, userId: sub })
         await writeFile('sessionsDB.json', JSON.stringify(sessionsDB, null, 2))
-
 
         res.redirect(`http://localhost:5500/callback.html?sid=${sessionId}`)
         return res.end()
