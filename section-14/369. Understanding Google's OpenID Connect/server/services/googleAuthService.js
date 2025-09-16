@@ -13,13 +13,18 @@ const client = new OAuth2Client({
 
 export function generateGoogleAuthUrl() {
   return client.generateAuthUrl({
-    scope: ["email", "profile", "openid"]
+    scope: ["email", "profile", "openid"],
+    prompt: "consent",
+    access_type: "offline"
   })
 }
 
 export async function fetchUserFromGoogle(code) {
     const { tokens } = await client.getToken(code)
+    console.log(tokens);
+
     const idToken = tokens.id_token
+
 
     const loginTicket = await client.verifyIdToken({
         idToken: idToken,
