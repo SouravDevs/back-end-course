@@ -1,4 +1,5 @@
 const sid = new URLSearchParams(location.search).get("sid")
+const error = new URLSearchParams(location.search).get("error")
 
 if (sid) {
     const baseUrl = 'http://localhost:4000';
@@ -10,4 +11,7 @@ if (sid) {
         window.opener.postMessage({ message: "success" })
         window.close()
     }
+}
+if(error) {
+    window.close()
 }

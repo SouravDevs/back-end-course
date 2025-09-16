@@ -33,8 +33,8 @@ app.get('/auth/google/callback', async (req, res) => {
 
     const { code } = req.query;
 
-
-    const { sub, email, name, picture } = await fetchUserFromGoogle(code)
+    if(code) {
+         const { sub, email, name, picture } = await fetchUserFromGoogle(code)
     
     const existingUser = usersDB.find(({ id }) => id === sub)
 
@@ -60,6 +60,10 @@ app.get('/auth/google/callback', async (req, res) => {
 
     res.redirect(`http://localhost:5500/callback.html?sid=${sessionId}`)
     return res.end()
+    }
+    else {
+        res.end()
+    }
 })
 
 app.get('/session-cookie', async (req, res) => {

@@ -14,10 +14,7 @@ const client = new OAuth2Client({
 export function generateGoogleAuthUrl() {
   return client.generateAuthUrl({
     scope: ["email", "profile", "openid"],
-    // prompt: "none",
-    // prompt: "consent",
-    // prompt: "select_account"
-    // login_hint: "sssmmm436480@gmail.com"
+    prompt: "consent",
   })
 }
 
