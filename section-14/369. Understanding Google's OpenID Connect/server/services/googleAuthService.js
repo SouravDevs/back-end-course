@@ -5,6 +5,8 @@ const client_id = ''
 const clientSecret = ``
 const redirectUrl = 'http://localhost:4000/auth/google/callback'
 
+
+// Setting-up Google Client
 const client = new OAuth2Client({
   client_id,
   clientSecret,

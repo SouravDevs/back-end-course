@@ -1,10 +1,11 @@
 import express from 'express';
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
-import { fetchUserFromGoogle, generateGoogleAuthUrl } from './services/googleAuthService.js';
 import usersDB from './usersDB.json' with { type: "json" }
 import sessionsDB from './sessionsDB.json' with { type: "json" }
 import { writeFile } from 'fs/promises';
+import './passport.js'
+import passport from 'passport';
 
 const app = express()
 const PORT = 4000
@@ -19,26 +20,23 @@ app.use(express.json())
 
 
 // Generate AuthURL and Redirect
-app.get('/auth/google', async (req, res) => {
-    res.redirect(generateGoogleAuthUrl())
-    res.end()
-})
+app.get("/auth/google", passport.authenticate("google", 
+    { scope:
+         ["email", "profile", "openid"],
+         prompt: "consent"
+    }))
 
 
 // Extract Auth Code and Exchange for ID Token
-app.get('/auth/google/callback', async (req, res) => {
-    const { sid } = req.cookies;
-
-    const existingSession = sessionsDB.find((session) => session.sessionId === sid)
-
-    if(existingSession) {
-        return res.json({ message: "Already logged in"})
+app.get('/auth/google/callback', 
+  passport.authenticate('google', 
+    { 
+    failureRedirect: 'http://localhost:5500/callback.html',
+    session: false // disable express json
     }
-
-    const { code } = req.query;
-
-    if(code) {
-         const { sub, email, name, picture } = await fetchUserFromGoogle(code)
+    ),
+ async (req, res) => {
+    const { sub, email, name, picture } = req.user._json
     
     const existingUser = usersDB.find(({ id }) => id === sub)
 
@@ -64,11 +62,8 @@ app.get('/auth/google/callback', async (req, res) => {
 
     res.redirect(`http://localhost:5500/callback.html?sid=${sessionId}`)
     return res.end()
-    }
-    else {
-        res.end()
-    }
-})
+  });
+
 
 app.get('/session-cookie', async (req, res) => {
     const { sid } = req.query;
