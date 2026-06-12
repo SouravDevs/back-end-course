@@ -5,19 +5,29 @@ const client = new MongoClient("mongodb://127.0.0.1:27017");
 await client.connect();
 
 const db = client.db();
-const collection = db.collection("users");
 
 await db.command({
   collMod: "users",
   validator: {
-    name: {
-      $type: "string",
-    },
-    age: {
-      $type: "int"
+    $jsonSchema: {
+      required: ["name", "age"],
+      properties: {
+        _id: {
+          bsonType: "objectId",
+        },
+        name: {
+          bsonType: "string",
+          minLength: 3,
+        },
+        age: {
+          bsonType: "int",
+          minimum: 18,
+          maximum: 80,
+        },
+      },
+      additionalProperties: false,
     },
   },
-  validationAction: 'warn' 
 });
 
 // const collections = await db.listCollections().toArray();
